@@ -19,18 +19,27 @@ const userController = {
       console.log(resetLink);
       var mailOptions = {
         from: FROM,
-        to: "deepikaudt@gmail.com",
+        to: "deepikaudt@gmail.com", //email
         subject: "Sending Email using Node.js",
         text: resetLink,
       };
+      let date = new Date();
+      date.setHours(date.getHours() + 1); // Adds 1 hour to the current date
 
-      transporter.sendMail(mailOptions, function (error, info) {
+      transporter.sendMail(mailOptions, async function (error, info) {
         if (error) {
           console.log(error);
           response.send(error.message);
         } else {
-          //insert token into database 
-          
+          try {
+            //insert token into database
+            await User.updateOne(
+              { id: email },
+              { $set: { token: randomString, useBefore: date } }
+            );
+          } catch (err) {
+            console.log(err);
+          }
           console.log("Email sent: " + info.response);
           response.send("link sent");
         }

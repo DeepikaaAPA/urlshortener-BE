@@ -9,7 +9,7 @@ const userSchema = mongoose.Schema({
     default: null,
   },
   useBefore: {
-    type: String,
+    type: Date,
     default: null,
   },
 });
