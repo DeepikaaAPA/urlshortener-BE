@@ -17,13 +17,13 @@ const userController = {
       const randomString = jwt.sign({ email }, process.env.JWT_SECRET);
 
       //generate the link
-      const resetLink = FORNTEND_LINK + "/reset/" + randomString;
+      const resetLink = FORNTEND_LINK + "/reset/";
       console.log(resetLink);
       var mailOptions = {
         from: FROM,
         to: "deepikaudt@gmail.com", //email
         subject: "Sending Email using Node.js",
-        text: resetLink,
+        text: `Link:${resetLink} \nCode:${randomString}`,
       };
       let date = new Date();
       date.setHours(date.getHours() + 1); // Adds 1 hour to the current date
