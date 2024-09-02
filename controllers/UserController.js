@@ -17,12 +17,12 @@ const userController = {
       const randomString = jwt.sign({ email }, process.env.JWT_SECRET);
 
       //generate the link
-      const resetLink = FORNTEND_LINK + "/reset/";
-      console.log(resetLink);
+      const resetLink = FORNTEND_LINK + "/reset";
+
       var mailOptions = {
         from: FROM,
         to: "deepikaudt@gmail.com", //email
-        subject: "Sending Email using Node.js",
+        subject: "Password reset request - reg",
         text: `Link:${resetLink} \nCode:${randomString}`,
       };
       let date = new Date();
@@ -55,13 +55,13 @@ const userController = {
   },
   verifyReset: async (req, res) => {
     const { token } = req.params;
-    console.log(token);
+    // console.log(token);
     try {
       const storedToken = await User.findOne({ token });
       if (!storedToken)
         return res
           .status(404)
-          .json({ message: "Invalid Token", status: "invalid" });
+          .json({ message: "Token not found", status: "invalid" });
     } catch (err) {
       console.log(err);
     }
@@ -72,25 +72,31 @@ const userController = {
 
     if (email !== decoded_email)
       return res.status(404).json({ message: "Invalid ID", status: "invalid" });
-    console.log(decoded_email);
+    //console.log(decoded_email);
 
-    const user = User.find({ id: email });
-    if (!user)
+    const userDocument = await User.findOne({ id: email });
+    if (!userDocument)
       return res
         .status(404)
-        .json({ message: "User doesnot exist.", status: "invalid" });
+        .json({ message: "User does not exist.", status: "invalid" });
 
-    if (!user.token)
-      return res
-        .status(404)
-        .json({ message: "Token invalid", status: "invalid" });
+    if (!userDocument.token)
+      return res.status(404).json({
+        message: "Reset request has not been raised.",
+        status: "invalid",
+      });
 
-    if (Date.now() > user.useBefore)
+    if (Date.now() > userDocument.useBefore)
       return res
         .status(404)
         .json({ message: "Token timed out.", status: "invalid" });
 
-    return res.status(200).json({ message: "Token valid", status: "valid" });
+    if (userDocument.token === token)
+      return res.status(200).json({ message: "Token valid", status: "valid" });
+    else
+      return res
+        .status(404)
+        .json({ message: "Wrong token.", status: "invalid" });
   },
   resetPassword: async (req, res) => {},
 
