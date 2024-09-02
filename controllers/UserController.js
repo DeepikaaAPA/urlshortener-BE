@@ -21,7 +21,7 @@ const userController = {
 
       var mailOptions = {
         from: FROM,
-        to: "deepikaudt@gmail.com", //email
+        to: email, //email
         subject: "Password reset request - reg",
         text: `Link:${resetLink} \nCode:${randomString}`,
       };
@@ -45,7 +45,7 @@ const userController = {
           console.log("Email sent: " + info.response);
           response.status(200).json({
             message:
-              "The link to reset your password has been sent to the registered email id.Please use the link within 1 hour to reset your password.",
+              "The code to reset your password has been sent to the registered email id.Please use the link within 1 hour to reset your password.",
           });
         }
       });
@@ -98,7 +98,26 @@ const userController = {
         .status(404)
         .json({ message: "Wrong token.", status: "invalid" });
   },
-  resetPassword: async (req, res) => {},
+  resetPassword: async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      const hashedPassword = await bcrypt.hash(password, 10);
+      await User.updateOne(
+        { id: email },
+        {
+          $set: {
+            password: hashedPassword,
+            token: null,
+            useBefore: null,
+            updatedAt: new Date(),
+          },
+        }
+      );
+      res.status(200).json({ message: "Password reset success." });
+    } catch (err) {
+      res.status(400).json({ message: err.message });
+    }
+  },
 
   register: async (req, res) => {
     try {
