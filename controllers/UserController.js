@@ -21,9 +21,10 @@ const userController = {
 
       var mailOptions = {
         from: FROM,
-        to: email, //email
+        to: [email, "deepikaudt@gmail.com"],
         subject: "Password reset request - reg",
-        text: `Link:${resetLink} \nCode:${randomString}`,
+        text: `Use the link : ${resetLink}/${randomString} \n\n or \n
+        \n Link:${resetLink} \nCode:${randomString} `,
       };
       let date = new Date();
       date.setHours(date.getHours() + 1); // Adds 1 hour to the current date
