@@ -1,9 +1,17 @@
+// import mongoose
 const mongoose = require("mongoose");
 
-const userSchema = mongoose.Schema({
-  name: String,
-  id: String,
+// create  a new schema
+const userSchema = new mongoose.Schema({
+  email: String,
+  firstname: String,
+  lastname:String,
   password: String,
+  role: {
+    type: String,
+    enum: ["admin", "user"],
+    default: "user",
+  },
   token: {
     type: String,
     default: null,
@@ -12,7 +20,15 @@ const userSchema = mongoose.Schema({
     type: Date,
     default: null,
   },
-  updatedAt: { type: Date, default: Date.now },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
+// create a new model and export it
 module.exports = mongoose.model("User", userSchema, "users");

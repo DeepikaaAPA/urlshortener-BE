@@ -8,7 +8,7 @@ const userController = {
     try {
       const { email } = request.body;
 
-      const user = await User.findOne({ id: email });
+      const user = await User.findOne({ email });
 
       if (!user) {
         return response.json({ message: "User does not exist" });
@@ -37,7 +37,7 @@ const userController = {
           try {
             //insert token into database
             await User.updateOne(
-              { id: email },
+              { email },
               { $set: { token: randomString, useBefore: date } }
             );
           } catch (err) {
@@ -75,7 +75,7 @@ const userController = {
       return res.status(404).json({ message: "Invalid ID", status: "invalid" });
     //console.log(decoded_email);
 
-    const userDocument = await User.findOne({ id: email });
+    const userDocument = await User.findOne({ email });
     if (!userDocument)
       return res
         .status(404)
@@ -104,7 +104,7 @@ const userController = {
       const { email, password } = req.body;
       const hashedPassword = await bcrypt.hash(password, 10);
       await User.updateOne(
-        { id: email },
+        { email },
         {
           $set: {
             password: hashedPassword,
@@ -117,33 +117,6 @@ const userController = {
       res.status(200).json({ message: "Password reset success." });
     } catch (err) {
       res.status(400).json({ message: err.message });
-    }
-  },
-
-  register: async (req, res) => {
-    try {
-      // get the user input
-
-      const { name, email, password } = req.body;
-
-      // check if the user already exists
-      const user = await User.findOne({ id: email });
-
-      if (user) {
-        return res.status(400).json({ message: "User already exists" });
-      }
-
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      // create a new user
-      const newUser = new User({ name, id: email, password: hashedPassword });
-
-      // save the user
-      await newUser.save();
-
-      res.status(201).json({ message: "User created successfully" });
-    } catch (error) {
-      res.status(500).json({ message: error.message });
     }
   },
 };
