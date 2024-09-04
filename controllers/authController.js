@@ -6,14 +6,22 @@ const { JWT_SECRET } = require("../utils/config");
 const authController = {
   register: async (req, res) => {
     try {
+      const now = new Date();
       // get the user input
       const { firstname, lastname, email, password } = req.body;
 
       // check if the user already exists
       const user = await User.findOne({ email });
 
-      if (user) {
+      if (user.activationStatus === "active") {
         return res.status(400).json({ message: "User already exists" });
+      }
+
+      if (user.activateBefore > now) {
+        return res.status(400).json({
+          message:
+            "Activation link has already been sent.Use link in mail to activate the account",
+        });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -24,6 +32,8 @@ const authController = {
         lastname,
         email,
         password: hashedPassword,
+        activationStatus: "inactive",
+        activateBefore:   now.setHours(now.getHours() + 1)
       });
 
       // save the user

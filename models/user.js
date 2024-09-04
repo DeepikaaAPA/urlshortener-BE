@@ -5,13 +5,16 @@ const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema({
   email: String,
   firstname: String,
-  lastname:String,
+  lastname: String,
   password: String,
   role: {
     type: String,
     enum: ["admin", "user"],
     default: "user",
   },
+  activateToken: { type: String, default: null },
+  activateBefore: { type: Date, default: null },
+  activationStatus: { type: String, default: "inactive" },
   token: {
     type: String,
     default: null,
