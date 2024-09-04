@@ -3,8 +3,14 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { FORNTEND_LINK, FROM, JWT_SECRET } = require("../utils/config");
 const transporter = require("../utils/sendMail");
+
 const userController = {
   getResetLink: async (request, response) => {
+    /**
+     * 
+     * token => random string generated using email for password reset
+     * 
+     **/
     try {
       const { email } = request.body;
 

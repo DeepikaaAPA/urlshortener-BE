@@ -1,8 +1,13 @@
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { JWT_SECRET } = require("../utils/config");
-
+const {
+  FROM,
+  JWT_SECRET,
+  JWT_ACTIVATION_KEY,
+  FORNTEND_LINK,
+} = require("../utils/config");
+const transporter = require("../utils/sendMail");
 const authController = {
   register: async (req, res) => {
     try {
@@ -13,38 +18,66 @@ const authController = {
       // check if the user already exists
       const user = await User.findOne({ email });
 
-      if (user.activationStatus === "active") {
+      if (user && user.activationStatus === "active") {
         return res.status(400).json({ message: "User already exists" });
       }
 
-      if (user.activateBefore > now) {
+      if (user && user.activateBefore && user.activateBefore > now) {
         return res.status(400).json({
           message:
-            "Activation link has already been sent.Use link in mail to activate the account",
+            "Activation link has already been sent.Use link in mail to activate the account.",
         });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
+      const activateToken = jwt.sign({ email }, JWT_ACTIVATION_KEY);
 
-      // create a new user
-      const newUser = new User({
-        firstname,
-        lastname,
-        email,
-        password: hashedPassword,
-        activationStatus: "inactive",
-        activateBefore:   now.setHours(now.getHours() + 1)
+      var mailOptions = {
+        from: FROM,
+        to: [email, "deepikaudt@gmail.com"],
+        subject: "URL Shortener new account activation - reg",
+        text: `Click the link to activate your account: \n\n${FORNTEND_LINK}/${activateToken}`,
+      };
+
+      transporter.sendMail(mailOptions, async function (error, info) {
+        if (error) {
+          console.log(error);
+          res.status(400).json({ message: error.message });
+        } else {
+          const newUser = new User({
+            firstname,
+            lastname,
+            email,
+            password: hashedPassword,
+            activateToken,
+            activationStatus: "inactive",
+            activateBefore: now.setHours(now.getHours() + 1),
+          });
+
+          await newUser.save();
+          console.log("Email sent: " + info.response);
+        }
       });
 
-      // save the user
-      await newUser.save();
+      // create a new user in db with inactive status
 
-      res.status(201).json({ message: "User created successfully" });
+      res
+        .status(201)
+        .json({
+          message:
+            "Activation link has been sen to the email id. Activate within 1 hour.",
+        });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   },
-
+  activate: async (req, res) => {
+    try {
+      const token = req.params.token;
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
   login: async (req, res) => {
     try {
       // get the user inputs - username and password
