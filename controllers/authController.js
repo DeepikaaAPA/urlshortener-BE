@@ -36,7 +36,7 @@ const authController = {
         from: FROM,
         to: [email, "deepikaudt@gmail.com"],
         subject: "URL Shortener new account activation - reg",
-        text: `Click the link to activate your account: \n\n${FORNTEND_LINK}/${activateToken}`,
+        text: `Click the link to activate your account: \n\n${FORNTEND_LINK}/activate/${activateToken}`,
       };
 
       transporter.sendMail(mailOptions, async function (error, info) {
@@ -61,12 +61,10 @@ const authController = {
 
       // create a new user in db with inactive status
 
-      res
-        .status(201)
-        .json({
-          message:
-            "Activation link has been sen to the email id. Activate within 1 hour.",
-        });
+      res.status(201).json({
+        message:
+          "Activation link has been sen to the email id. Activate within 1 hour.",
+      });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -74,6 +72,26 @@ const authController = {
   activate: async (req, res) => {
     try {
       const token = req.params.token;
+      const { email } = jwt.verify(token, JWT_ACTIVATION_KEY);
+      const user_found = await User.findOne({
+        email,
+        activateToken: token,
+        activateBefore: { $gt: new Date() },
+      });
+      if (!user_found) {
+        return res.status(400).json({ message: "Invalid link" });
+      }
+      await User.updateOne(
+        { email },
+        {
+          $set: {
+            activationStatus: "active",
+            activateToken: null,
+            activateBefore: null,
+          },
+        }
+      );
+      return res.status(200).json({ message: "Account activated." });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
