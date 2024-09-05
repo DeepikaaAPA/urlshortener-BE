@@ -2,6 +2,7 @@ const express = require("express");
 const userRouter = require("./routes/userRouter");
 const authRouter = require("./routes/authRoutes");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const corsOptions = {
   origin: "https://password-reset-flow-react-app.netlify.app",
   credentials: true,
@@ -9,7 +10,7 @@ const corsOptions = {
 
 // create a new express app
 const app = express();
-
+app.use(cookieParser());
 // use the cors middleware
 app.use(cors(corsOptions));
 // use the express json middleware for parsing json data
