@@ -53,8 +53,26 @@ const authController = {
             activationStatus: "inactive",
             activateBefore: now.setHours(now.getHours() + 1),
           });
-
-          await newUser.save();
+          //user already exists but activation time is over.
+          if (user) {
+            await User.updateOne(
+              { email },
+              {
+                $set: {
+                  firstname,
+                  lastname,
+                  password: hashedPassword,
+                  activateToken,
+                  activationStatus: "inactive",
+                  activateBefore: now.setHours(now.getHours() + 1),
+                  updatedAt: new Date(),
+                },
+              }
+            );
+          } else {
+            //new user
+            await newUser.save();
+          }
           console.log("Email sent: " + info.response);
         }
       });
@@ -107,6 +125,10 @@ const authController = {
       if (!user) {
         return res.status(400).json({ message: "User not found" });
       }
+      if (user.activationStatus === "inactive")
+        return res
+          .status(400)
+          .json({ message: "Account must be activated before logging in." });
 
       // compare the password
       const validPassword = await bcrypt.compare(password, user.password);
