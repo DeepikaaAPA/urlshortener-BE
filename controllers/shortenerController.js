@@ -68,6 +68,14 @@ const shortenerController = {
       return res.status(500).json({ message: err.message });
     }
   },
-  getURLs: async (req, res) => {},
+  getURLs: async (req, res) => {
+    try {
+      const userId = req.userId;
+      const result = await Url.find({ userId }).select("-__v -_id");
+      return res.status(200).json(result);
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
+  },
 };
 module.exports = shortenerController;
