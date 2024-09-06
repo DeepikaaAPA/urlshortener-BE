@@ -1,10 +1,10 @@
 const { JWT_SECRET, FORNTEND_LINK } = require("../utils/config");
 const Url = require("../models/url");
+const Log = require("../models/log");
 const shortenerController = {
   shorten: async (req, res) => {
     try {
       const longUrl = req.body.longUrl;
-      console.log(longUrl);
       const userId = req.userId;
 
       const url_retrieved = await Url.findOne({ longUrl });
@@ -32,11 +32,42 @@ const shortenerController = {
     }
   },
   retrieveUrl: async (req, res) => {
-    const shortnerCode = req.params.code;
-  
-    const answer = await Url.findOne({ shortnerCode });
-    if (!answer) return res.status(400).json({ message: "Not found" });
-    res.status(301).redirect(answer.longUrl);
+    try {
+      const shortnerCode = req.params.code;
+      const userId = req.userId;
+      const answer = await Url.findOne({ shortnerCode });
+      if (!answer) return res.status(400).json({ message: "Not found" });
+
+      const date = new Date();
+      const monthNames = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+      const clickedMonth = monthNames[date.getMonth()];
+      const clickedYear = date.getFullYear();
+      const newLog = new Log({
+        userId,
+        shortnerCode,
+        clickedMonth,
+        clickedYear,
+        clickedMonthYear: `${clickedMonth}-${clickedYear}`,
+      });
+      await newLog.save();
+      res.status(301).redirect(answer.longUrl);
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
   },
+  getURLs: async (req, res) => {},
 };
 module.exports = shortenerController;

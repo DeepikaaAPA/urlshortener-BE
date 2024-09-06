@@ -15,5 +15,6 @@ authRouter.get(
   "/shorts/:code",
   auth.verifyToken,
   shortenerController.retrieveUrl
-),
-  (module.exports = authRouter);
+);
+authRouter.get("/getURLs", auth.verifyToken, shortenerController.getURLs);
+module.exports = authRouter;
