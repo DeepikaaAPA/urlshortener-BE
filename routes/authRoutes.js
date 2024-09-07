@@ -17,4 +17,9 @@ authRouter.get(
   shortenerController.retrieveUrl
 );
 authRouter.get("/getURLs", auth.verifyToken, shortenerController.getURLs);
+authRouter.get(
+  "/getClickCount/:monthYear",
+  auth.verifyToken,
+  shortenerController.getCLickCount
+);
 module.exports = authRouter;

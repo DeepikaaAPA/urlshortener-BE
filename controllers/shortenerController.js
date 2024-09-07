@@ -53,13 +53,16 @@ const shortenerController = {
         "November",
         "December",
       ];
+      const clickedDay = date.getDate();
       const clickedMonth = monthNames[date.getMonth()];
       const clickedYear = date.getFullYear();
       const newLog = new Log({
         userId,
         shortnerCode,
+        clickedDay,
         clickedMonth,
         clickedYear,
+
         clickedMonthYear: `${clickedMonth}-${clickedYear}`,
       });
       await newLog.save();
@@ -73,6 +76,29 @@ const shortenerController = {
       const userId = req.userId;
       const result = await Url.find({ userId }).select("-__v -_id");
       return res.status(200).json(result);
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
+  },
+  getCLickCount: async (req, res) => {
+    try {
+      const monthYear = req.params.monthYear;
+      const userId = req.userId;
+      const results = await Log.aggregate([
+        {
+          $match: { userId: userId, clickedMonthYear: monthYear },
+        },
+        {
+          $group: {
+            _id: "$clickedDay",
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $sort: { _id: 1 },
+        },
+      ]);
+      return res.status(200).json({ results });
     } catch (err) {
       return res.status(500).json({ message: err.message });
     }

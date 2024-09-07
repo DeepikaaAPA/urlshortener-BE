@@ -12,6 +12,7 @@ const logSchema = new mongoose.Schema({
   clickedMonth: String,
   clickedYear: Number,
   clickedMonthYear: String,
+  clickedDay: Number,
 });
 
 // create a new model and export it
