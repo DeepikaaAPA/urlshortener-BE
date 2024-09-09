@@ -147,7 +147,7 @@ const authController = {
         secure: true,
       });
 
-      res.json({ message: "Login successful" });
+      res.json({ message: "Logged in." });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

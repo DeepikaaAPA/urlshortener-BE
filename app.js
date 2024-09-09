@@ -3,8 +3,9 @@ const userRouter = require("./routes/userRouter");
 const authRouter = require("./routes/authRoutes");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const { FORNTEND_LINK } = require("./utils/config");
 const corsOptions = {
-  origin: "https://password-reset-flow-react-app.netlify.app",
+  origin: "http://localhost:5173",
   credentials: true,
 };
 
