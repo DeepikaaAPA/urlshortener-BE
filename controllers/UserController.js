@@ -7,9 +7,9 @@ const transporter = require("../utils/sendMail");
 const userController = {
   getResetLink: async (request, response) => {
     /**
-     * 
+     *
      * token => random string generated using email for password reset
-     * 
+     *
      **/
     try {
       const { email } = request.body;
@@ -19,6 +19,10 @@ const userController = {
       if (!user) {
         return response.json({ message: "User does not exist" });
       }
+      if (user.activationStatus === "inactive")
+        return response.status(400).json({
+          message: "Account must be registered and activated before reset!",
+        });
       //generate random string
       const randomString = jwt.sign({ email }, process.env.JWT_SECRET);
 

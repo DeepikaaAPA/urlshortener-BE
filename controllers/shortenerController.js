@@ -33,7 +33,7 @@ const shortenerController = {
   },
   retrieveUrl: async (req, res) => {
     try {
-      const shortnerCode = req.params.code;
+      const shortnerCode = Number(req.params.code);
       const userId = req.userId;
       const answer = await Url.findOne({ shortnerCode });
       if (!answer) return res.status(400).json({ message: "Not found" });
@@ -66,7 +66,7 @@ const shortenerController = {
         clickedMonthYear: `${clickedMonth}-${clickedYear}`,
       });
       await newLog.save();
-      res.status(301).redirect(answer.longUrl);
+      res.status(200).json({ longUrl: answer.longUrl });
     } catch (err) {
       return res.status(500).json({ message: err.message });
     }

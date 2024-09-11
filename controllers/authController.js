@@ -81,7 +81,7 @@ const authController = {
 
       res.status(201).json({
         message:
-          "Activation link has been sen to the email id. Activate within 1 hour.",
+          "Activation link has been sent to the email id. Activate within 1 hour.",
       });
     } catch (error) {
       res.status(500).json({ message: error.message });
