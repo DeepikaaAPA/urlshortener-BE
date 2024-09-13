@@ -8,6 +8,8 @@ const auth = {
     //const token = req.cookies.token;
     // Extract the token from the Authorization header
     const authHeader = req.headers["Authorization"];
+    console.log(authHeader);
+    console.log(req.headers);
     const token = authHeader && authHeader.split(" ")[1]; // Extract token from "Bearer <token>"
     console.log("token", token);
     if (token == null) return res.sendStatus(401); // No token provided
