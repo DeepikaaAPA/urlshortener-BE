@@ -5,7 +5,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const { FORNTEND_LINK } = require("./utils/config");
 const corsOptions = {
-  origin: FORNTEND_LINK,
+  origin: "*", //FORNTEND_LINK,
   credentials: true,
 };
 
