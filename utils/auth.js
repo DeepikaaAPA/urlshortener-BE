@@ -7,7 +7,7 @@ const auth = {
     // get the token from the cookie
     //const token = req.cookies.token;
     // Extract the token from the Authorization header
-    const authHeader = req.headers["Authorization"];
+    const authHeader = req.headers["authorization"];
     console.log(authHeader);
     console.log(req.headers);
     const token = authHeader && authHeader.split(" ")[1]; // Extract token from "Bearer <token>"
