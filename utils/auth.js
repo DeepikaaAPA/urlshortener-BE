@@ -4,31 +4,22 @@ const User = require("../models/user");
 
 const auth = {
   verifyToken: async (req, res, next) => {
-    try {
-      // get the token from the cookie
-      //const token = req.cookies.token;
-      const authHeader = req.headers["Authorization"];
-      const token = authHeader && authHeader.split(" ")[1];
+    // get the token from the cookie
+    //const token = req.cookies.token;
+    // Extract the token from the Authorization header
+    const authHeader = req.headers["Authorization"];
+    const token = authHeader && authHeader.split(" ")[1]; // Extract token from "Bearer <token>"
+    console.log("token", token);
+    if (token == null) return res.sendStatus(401); // No token provided
 
-      if (!token) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
+    // Verify the token
+    jwt.verify(token, JWT_SECRET, (err, userId) => {
+      if (err) return res.sendStatus(403); // Forbidden if token is invalid
+      req.userId = userId; // Attach decoded user
+    });
 
-      try {
-        // verify the token
-        const decodedToken = jwt.verify(token, JWT_SECRET);
-
-        // attach the user id to the request object
-        req.userId = decodedToken.id;
-
-        // call the next middleware
-        next();
-      } catch (error) {
-        return res.status(401).json({ message: "Invalid token" });
-      }
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
+    // call the next middleware
+    next();
   },
 
   isAdmin: async (req, res, next) => {
