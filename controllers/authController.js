@@ -165,7 +165,7 @@ const authController = {
 
   me: async (req, res) => {
     // get the user id from the request object
-    const userId = req.userId.userId;
+    const userId = req.userId;
 
     // get the user details from the database
     const user = await User.findById(userId).select(

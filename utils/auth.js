@@ -8,7 +8,7 @@ const auth = {
     //const token = req.cookies.token;
     // Extract the token from the Authorization header
     const authHeader = req.headers["authorization"];
-    console.log(authHeader);
+    console.log("authheader :", authHeader);
     console.log(req.headers);
     const token = authHeader && authHeader.split(" ")[1]; // Extract token from "Bearer <token>"
     console.log("token", token);
@@ -17,7 +17,8 @@ const auth = {
     // Verify the token
     jwt.verify(token, JWT_SECRET, (err, userId) => {
       if (err) return res.sendStatus(403); // Forbidden if token is invalid
-      req.userId = userId; // Attach decoded user
+      console.log("userId :", userId);
+      req.userId = userId.id; // Attach decoded user
     });
 
     // call the next middleware
