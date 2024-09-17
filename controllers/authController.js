@@ -91,12 +91,14 @@ const authController = {
     try {
       const token = req.params.token;
       const { email } = jwt.verify(token, JWT_ACTIVATION_KEY);
+      console.log("token , email :", token, email);
       const user_found = await User.findOne({
         email,
         activateToken: token,
         activateBefore: { $gt: new Date() },
       });
       if (!user_found) {
+        console.log("user not found");
         return res.status(400).json({ message: "Invalid link" });
       }
       await User.updateOne(
@@ -109,6 +111,7 @@ const authController = {
           },
         }
       );
+      console.log("account activated");
       return res.status(200).json({ message: "Account activated." });
     } catch (error) {
       res.status(500).json({ message: error.message });

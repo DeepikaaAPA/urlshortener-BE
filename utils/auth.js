@@ -4,20 +4,18 @@ const User = require("../models/user");
 
 const auth = {
   verifyToken: async (req, res, next) => {
-    // get the token from the cookie
-    //const token = req.cookies.token;
     // Extract the token from the Authorization header
     const authHeader = req.headers["authorization"];
-    console.log("authheader :", authHeader);
-    console.log(req.headers);
+    // console.log("authheader :", authHeader);
+    // console.log(req.headers);
     const token = authHeader && authHeader.split(" ")[1]; // Extract token from "Bearer <token>"
-    console.log("token", token);
+    // console.log("token", token);
     if (token == null) return res.sendStatus(401); // No token provided
 
     // Verify the token
     jwt.verify(token, JWT_SECRET, (err, userId) => {
       if (err) return res.sendStatus(403); // Forbidden if token is invalid
-      console.log("userId :", userId);
+      // console.log("userId :", userId);
       req.userId = userId.id; // Attach decoded user
     });
 
